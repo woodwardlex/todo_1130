@@ -4,6 +4,7 @@ import React, {Component} from 'react';
 import {ToDoBanner} from './TODOBANNER';
 import {ToDoRow} from './TODOROW';
 import {ToDoCreator} from './TODOCREATOR';
+import {VisibilityControl} from './VISIBILITYCONTROL';
 import 'bootstrap/dist/css/bootstrap.css';
 
 export default class App extends Component {
@@ -59,7 +60,7 @@ export default class App extends Component {
       todoList: this.state.todoList.map(
         bob => bob.action === checkedToDoItem.action ? {...bob, done: !bob.done} : bob
       )
-    }
+    }, () => localStorage.setItem("storedToDoObject", JSON.stringify(this.state))
   );
 
   //  Feature 5d
@@ -76,15 +77,48 @@ export default class App extends Component {
             {action: newToDoAction, done: false}
           ]
           // By default every new todo should not be done- in other words it's done property should have a value of false.
-        }
-      )
-    }
+        }, () => localStorage.setItem("storedToDoObject", JSON.stringify(this.state))//end SETITEM
+      );//end SETSTATE
+    }//end IF
+  }//end CREATENEWTODOCALLBACK
 
 
   // Feature 5e
   //  The componentDidMount method below is a built in react method to handle logic for when the APP Component "mounts" or "loads"
   componentDidMount = () =>
   {
+    localStorage.clear();
+
+    fetch("http://localhost:53154/api/todos?todoOwnerID=1")
+      .then(response => response.json())
+      .then((data) => {
+        console.log(JSON.stringify({data}));
+
+        var apiList = [];
+
+        for (var i = 0; i < data.Data.length; i++)
+        {
+          var isDone = true;
+          if (data.Data[i].don === 0){
+          isDone = false;
+          }
+          var element = {action: data.Data[i].action, done: isDone};
+          apiList.push(element);
+        }//end FOR
+
+        let storedData = localStorage.getItem("storedToDoObject");
+        this.setState(
+          storedData != null ? JSON.parse(storedData) : 
+          {
+            todoOwner: data.Data[0].todoOwner,
+            todoList: apiList,
+            showCompleted: true // Feature 8
+          }
+        );//end SETSTATE
+      })
+      .catch(console.log);
+
+
     
   }
 
@@ -112,7 +146,18 @@ export default class App extends Component {
         </tbody>
       </table>
 
-      {/* Features 6 & 7 */}
+      {/* Feature 8 */}
+      <div className = "bg-secondary text-white text-center p-2">
+        <VisibilityControl
+          description="Completed Tasks"
+          isChecked={this.state.showCompleted}
+          callback={checked => this.setState({showCompleted: checked})}
+        />
+      </div>
+      
+{/* Features 6 & 7 */}
+{this.state.showCompleted && 
+      
       <table className ="table table-striped table-bordered">
         <thead>
           <th>Action</th>
@@ -122,9 +167,10 @@ export default class App extends Component {
           {this.todoTableRows(true)}
         </tbody>
       </table>
+}
     </div>
   }//end of APP
-}
+
 /*
 function App() {
 return (
