@@ -2,6 +2,7 @@
 import './App.css';
 import React, {Component} from 'react';
 import {ToDoBanner} from './TODOBANNER';
+import {ToDoRow} from './TODOROW';
 import 'bootstrap/dist/css/bootstrap.css';
 
 export default class App extends Component {
@@ -25,16 +26,79 @@ export default class App extends Component {
     }
   }//end of CONSTRUCTOR
 
-  render = () =>
-    <div>
-      {/* Features 1 & 2 */}
-      <ToDoBanner
-        todoOwner={this.state.todoOwner}
-        todoList={this.state.todoList}
+  //  Feature 3 & 4
+  //  If the ToDoRow Component's "done" property experiences a change event (ie. checking the Mark Complete box in the UI) then the ToDoRow Component calls a callback method called toggleToDo (below)  and passes toggleToDo the checked todo item
+  //  ----- Function to display table rows ------
+  todoTableRows = (finishedTask) => this.state.todoList.filter(
+    x => x.done === finishedTask).map(y =>
+      <ToDoRow
+        key={y.action}
+        item={y}
+        callback={this.toggleToDo}  // The callback will be invoked (executed, run) when everything in <ToDoRow> is finished AND the user clicks the input box
+        //  The data passed into the callback from the ToDoRow component is passed automatically into the function defined in the callback
       />
-    </div>
+    );
 
-}//end of APP
+  // todoTableRows = (finishedTask) => this.state.todoList.filter(
+
+  //   x => x.done === finishedTask).map(y => 
+  //     <ToDoRow 
+  //         key={y.action}
+  //         item={y}
+  //         callback={this.toggleToDo} // The callback will be invoked (executed, run) when everything in <ToDoRow> is finished AND the user clicks the input box
+  //         //  The data passed into the callback from the ToDoRow componet is passed automatically into the function defined in the callback  
+  //     />
+  // );
+
+  // ------------Function to toggle an item from done to not done or vice-versa
+  toggleToDo = (checkedToDoItem) => this.setState(
+
+    {
+      todoList: this.state.todoList.map(
+        bob => bob.action === checkedToDoItem.action ? {...bob, done: !bob.done} : bob
+
+      )
+    }
+
+
+  );
+
+  // toggleToDo = (checkedToDoItem) => this.setState(
+  //   {
+  //     todoList: this.state.todoList.map(
+  //       bob => bob.action === checkedToDoItem.action ? {...bob, done: !bob.done} : bob
+
+  //     )
+
+
+  //   }
+
+
+
+  // );
+
+    render = () =>
+      <div>
+        {/* Features 1 & 2 */}
+        <ToDoBanner
+          todoOwner = {this.state.todoOwner}
+          todoList = {this.state.todoList}
+        />
+
+
+        {/* Features 3 & 4 */}
+        <table className ="table table-striped table-bordered">
+          <thead>
+            <th>Action</th>
+            <th>Mark As Complete</th>
+          </thead>
+          <tbody>
+            {this.todoTableRows(false)}
+          </tbody>
+        </table>
+      </div>
+
+    }//end of APP
 
 /*
 function App() {
