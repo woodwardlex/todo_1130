@@ -39,6 +39,7 @@ export default class App extends Component {
       />
     );
 
+
   // todoTableRows = (finishedTask) => this.state.todoList.filter(
 
   //   x => x.done === finishedTask).map(y => 
@@ -96,8 +97,18 @@ export default class App extends Component {
             {this.todoTableRows(false)}
           </tbody>
         </table>
-      </div>
 
+        {/* Features 6 & 7 */}
+        <table className ="table table-striped table-bordered">
+          <thead>
+            <th>Action</th>
+            <th>Mark As Not Complete</th>
+          </thead>
+          <tbody>
+            {this.todoTableRows(true)}
+          </tbody>
+        </table>
+      </div>
     }//end of APP
 
 /*
